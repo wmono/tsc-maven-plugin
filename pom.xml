@@ -13,6 +13,7 @@
 	</description>
 
 	<modules>
+		<module>typescript</module>
 		<module>tsc-maven-plugin</module>
 		<module>tsc-maven-demo-project</module>
 	</modules>
