@@ -53,6 +53,14 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project.build.directory}/app.js")
 	private File outputFile;
 
+	/** Target language level */
+	@Parameter(defaultValue = "ES5")
+	private String targetLanguageLevel;
+
+	/** Generate source map files */
+	@Parameter(defaultValue = "true")
+	private boolean generateSourceMap;
+
 	/** (Advanced) Arguments to tsc. <b>This overrides all other command line argument options.</b> */
 	@Parameter
 	private String[] overrideArguments;
@@ -234,8 +242,12 @@ public class CompileMojo extends AbstractMojo {
 		}
 		else {
 			arguments.addAll(Arrays.asList(
-					"--out", outputFile.getAbsolutePath()
+					"--out", outputFile.getAbsolutePath(),
+					"--target", targetLanguageLevel
 			));
+			if (generateSourceMap) {
+				arguments.add("--sourceMap");
+			}
 			arguments.addAll(Arrays.asList(sources));
 		}
 
