@@ -73,6 +73,10 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "1.4.1")
 	private String typescriptVersion;
 
+	/** (Internal) Relative path to tsc */
+	@Parameter(defaultValue = "bin/tsc")
+	private String typescriptTscPath;
+
 	/** (Internal) Maven version for the Avatar.js artifact */
 	@Parameter(defaultValue = "0.10.32-SNAPSHOT")
 	private String avatarJsVersion;
@@ -80,6 +84,10 @@ public class CompileMojo extends AbstractMojo {
 	/** (Internal) Temporary directory where the Avatar.js native library will be copied */
 	@Parameter(defaultValue = "${project.build.directory}/tsc-maven/avatar-js")
 	private File avatarJsHome;
+
+	/** (Internal) Maven version for the org.codehaus.mojo:exec-maven-plugin artifact */
+	@Parameter(defaultValue = "1.3.2")
+	private String execMavenPluginVersion;
 
 	@Component
 	private MavenProject mavenProject;
@@ -159,7 +167,7 @@ public class CompileMojo extends AbstractMojo {
 
 		getLog().info("Starting TypeScript compiler...");
 		executeMojo(
-				plugin("org.codehaus.mojo", "exec-maven-plugin", "1.3.2"),
+				plugin("org.codehaus.mojo", "exec-maven-plugin", execMavenPluginVersion),
 				"exec",
 				configuration(
 						element("executable", "java"),
@@ -167,7 +175,7 @@ public class CompileMojo extends AbstractMojo {
 								element("argument", "-Djava.library.path=" + avatarJsHome.getAbsolutePath()),
 								element("argument", "-jar"),
 								element("argument", avatarJs.getAbsolutePath()),
-								element("argument", typescriptHome.getAbsolutePath() + File.separator + "bin/tsc")
+								element("argument", typescriptHome.getAbsolutePath() + File.separator + typescriptTscPath)
 						)
 				),
 				executionEnvironment(mavenProject, mavenSession, pluginManager)
