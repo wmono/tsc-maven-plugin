@@ -49,9 +49,9 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "references.ts")
 	private String[] sources;
 
-	/** Output file, relative to sourceRoot */
+	/** Output file */
 	@Parameter(defaultValue = "${project.build.directory}/app.js")
-	private String outputFile;
+	private File outputFile;
 
 	/** (Advanced) Arguments to tsc. <b>This overrides all other command line argument options.</b> */
 	@Parameter
@@ -234,7 +234,7 @@ public class CompileMojo extends AbstractMojo {
 		}
 		else {
 			arguments.addAll(Arrays.asList(
-					"--out", outputFile
+					"--out", outputFile.getAbsolutePath()
 			));
 			arguments.addAll(Arrays.asList(sources));
 		}
