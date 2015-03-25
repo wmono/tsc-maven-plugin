@@ -49,27 +49,35 @@ public class CompileMojo extends AbstractMojo {
 	@Component
 	private ArchiverManager archiverManager;
 
+	/** (Internal) Temporary directory where the TypeScript distribution will be unpacked */
 	@Parameter(defaultValue = "${project.build.directory}/tsc-maven/typescript")
 	private File typescriptHome;
 
+	/** (Internal) Maven groupId for the TypeScript distribution that's been re-packaged as a Maven artifact */
 	@Parameter(defaultValue = "ca.eqv.maven.plugins.tsc")
 	private String typescriptGroupId;
 
+	/** (Internal) Maven artifactId for the TypeScript distribution that's been re-packaged as a Maven artifact */
 	@Parameter(defaultValue = "typescript")
 	private String typescriptArtifactId;
 
+	/** (Internal) Maven classifier for the TypeScript distribution that's been re-packaged as a Maven artifact */
 	@Parameter(defaultValue = "")
 	private String typescriptClassifier;
 
+	/** (Internal) Maven extension for the TypeScript distribution that's been re-packaged as a Maven artifact */
 	@Parameter(defaultValue = "zip")
 	private String typescriptExtension;
 
+	/** (Internal) Maven version for the TypeScript distribution that's been re-packaged as a Maven artifact */
 	@Parameter(defaultValue = "1.4.1")
 	private String typescriptVersion;
 
+	/** (Internal) Maven version for the Avatar.js artifact */
 	@Parameter(defaultValue = "0.10.32-SNAPSHOT")
 	private String avatarJsVersion;
 
+	/** (Internal) Temporary directory where the Avatar.js native library will be copied */
 	@Parameter(defaultValue = "${project.build.directory}/tsc-maven/avatar-js")
 	private File avatarJsHome;
 
