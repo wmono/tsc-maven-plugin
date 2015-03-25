@@ -23,10 +23,14 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.twdata.maven.mojoexecutor.MojoExecutor.Element;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
@@ -36,6 +40,24 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 
 @Mojo(name = "compile", defaultPhase = LifecyclePhase.COMPILE)
 public class CompileMojo extends AbstractMojo {
+
+	/** Root of TypeScript source tree (working directory) */
+	@Parameter(defaultValue = "${project.basedir}/src/main/typescript")
+	private File sourceRoot;
+
+	/** Top-level source files to compile, relative to sourceRoot */
+	@Parameter(defaultValue = "references.ts")
+	private String[] sources;
+
+	/** Output file, relative to sourceRoot */
+	@Parameter(defaultValue = "${project.build.directory}/app.js")
+	private String outputFile;
+
+	/** (Advanced) Arguments to tsc. <b>This overrides all other command line argument options.</b> */
+	@Parameter
+	private String[] overrideArguments;
+
+	// ---------- No user-serviceable configuration values below this line ---------- //
 
 	@Component
 	private RepositorySystem repoSystem;
@@ -163,20 +185,14 @@ public class CompileMojo extends AbstractMojo {
 	}
 
 	private void executeCompiler() throws MojoExecutionException {
-		final File avatarJs = getArtifact("com.oracle", "avatar-js", null, "jar", avatarJsVersion);
-
 		getLog().info("Starting TypeScript compiler...");
 		executeMojo(
 				plugin("org.codehaus.mojo", "exec-maven-plugin", execMavenPluginVersion),
 				"exec",
 				configuration(
 						element("executable", "java"),
-						element("arguments",
-								element("argument", "-Djava.library.path=" + avatarJsHome.getAbsolutePath()),
-								element("argument", "-jar"),
-								element("argument", avatarJs.getAbsolutePath()),
-								element("argument", typescriptHome.getAbsolutePath() + File.separator + typescriptTscPath)
-						)
+						element("workingDirectory", sourceRoot.getAbsolutePath()),
+						element("arguments", getTscArgumentElements())
 				),
 				executionEnvironment(mavenProject, mavenSession, pluginManager)
 		);
@@ -201,6 +217,30 @@ public class CompileMojo extends AbstractMojo {
 		catch (final ArtifactResolutionException e) {
 			throw new MojoExecutionException("Could not retrieve artifact", e);
 		}
+	}
+
+	private Element[] getTscArgumentElements() throws MojoExecutionException {
+		final File avatarJs = getArtifact("com.oracle", "avatar-js", null, "jar", avatarJsVersion);
+
+		final List<String> arguments = new ArrayList<>();
+		arguments.addAll(Arrays.asList(
+				"-Djava.library.path=" + avatarJsHome.getAbsolutePath(),
+				"-jar", avatarJs.getAbsolutePath(),
+				typescriptHome.getAbsolutePath() + File.separator + typescriptTscPath
+		));
+
+		if (overrideArguments != null && overrideArguments.length > 0) {
+			arguments.addAll(Arrays.asList(overrideArguments));
+		}
+		else {
+			arguments.addAll(Arrays.asList(
+					"--out", outputFile
+			));
+			arguments.addAll(Arrays.asList(sources));
+		}
+
+		getLog().info("Executing with arguments: " + arguments.stream().collect(Collectors.joining(", ")));
+		return arguments.stream().map(arg -> element("argument", arg)).toArray(Element[]::new);
 	}
 
 }
