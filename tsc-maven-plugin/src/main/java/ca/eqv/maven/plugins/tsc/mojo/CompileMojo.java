@@ -1,12 +1,15 @@
 package ca.eqv.maven.plugins.tsc.mojo;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
@@ -24,6 +27,12 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 
 @Mojo(name = "compile", defaultPhase = LifecyclePhase.COMPILE)
 public class CompileMojo extends AbstractMojo {
@@ -64,6 +73,15 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project.build.directory}/tsc-maven/avatar-js")
 	private File avatarJsHome;
 
+	@Component
+	private MavenProject mavenProject;
+
+	@Component
+	private MavenSession mavenSession;
+
+	@Component
+	private BuildPluginManager pluginManager;
+
 	@Override
 	public void execute() throws MojoExecutionException {
 		if (!typescriptHome.isDirectory()) {
@@ -79,6 +97,8 @@ public class CompileMojo extends AbstractMojo {
 		else {
 			getLog().debug("Skipping Avatar.js preparation");
 		}
+
+		executeCompiler();
 	}
 
 	private void unpackCompiler() throws MojoExecutionException {
@@ -124,6 +144,27 @@ public class CompileMojo extends AbstractMojo {
 		catch (final IOException e) {
 			throw new MojoExecutionException("Unable to prepare Avatar.js native library", e);
 		}
+	}
+
+	private void executeCompiler() throws MojoExecutionException {
+		final File avatarJs = getArtifact("com.oracle", "avatar-js", null, "jar", avatarJsVersion);
+
+		getLog().info("Starting TypeScript compiler...");
+		executeMojo(
+				plugin("org.codehaus.mojo", "exec-maven-plugin", "1.3.2"),
+				"exec",
+				configuration(
+						element("executable", "java"),
+						element("arguments",
+								element("argument", "-Djava.library.path=" + avatarJsHome.getAbsolutePath()),
+								element("argument", "-jar"),
+								element("argument", avatarJs.getAbsolutePath()),
+								element("argument", typescriptHome.getAbsolutePath() + File.separator + "bin/tsc")
+						)
+				),
+				executionEnvironment(mavenProject, mavenSession, pluginManager)
+		);
+		getLog().info("TypeScript compiler exited successfully.");
 	}
 
 	private File getArtifact(final String groupId, final String artifactId, final String classifier, final String extension, final String version) throws MojoExecutionException {
