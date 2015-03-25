@@ -89,10 +89,10 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "1.3.2")
 	private String execMavenPluginVersion;
 
-	@Component
+	@Parameter(defaultValue = "${project}", readonly = true)
 	private MavenProject mavenProject;
 
-	@Component
+	@Parameter(defaultValue = "${session}", readonly = true)
 	private MavenSession mavenSession;
 
 	@Component
