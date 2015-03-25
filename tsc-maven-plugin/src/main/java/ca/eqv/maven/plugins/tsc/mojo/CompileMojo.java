@@ -1,5 +1,6 @@
 package ca.eqv.maven.plugins.tsc.mojo;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -21,6 +22,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Mojo(name = "compile", defaultPhase = LifecyclePhase.COMPILE)
@@ -56,6 +58,12 @@ public class CompileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "1.4.1")
 	private String typescriptVersion;
 
+	@Parameter(defaultValue = "0.10.32-SNAPSHOT")
+	private String avatarJsVersion;
+
+	@Parameter(defaultValue = "${project.build.directory}/tsc-maven/avatar-js")
+	private File avatarJsHome;
+
 	@Override
 	public void execute() throws MojoExecutionException {
 		if (!typescriptHome.isDirectory()) {
@@ -63,6 +71,13 @@ public class CompileMojo extends AbstractMojo {
 		}
 		else {
 			getLog().debug("Skipping tsc extraction");
+		}
+
+		if (!avatarJsHome.isDirectory()) {
+			prepareAvatarJsNativeLibrary();
+		}
+		else {
+			getLog().debug("Skipping Avatar.js preparation");
 		}
 	}
 
@@ -86,6 +101,29 @@ public class CompileMojo extends AbstractMojo {
 		unarchiver.setSourceFile(file);
 		unarchiver.setDestDirectory(typescriptHome);
 		unarchiver.extract();
+	}
+
+	private void prepareAvatarJsNativeLibrary() throws MojoExecutionException {
+		final AvatarJsNativeLibraryPlatform platform = AvatarJsNativeLibraryPlatform.detect();
+		final String artifactId = "libavatar-js-" + platform.artifactIdSuffix;
+		final File repoFile = getArtifact("com.oracle", artifactId, null, platform.extension, avatarJsVersion);
+
+		final boolean createdDirectory = avatarJsHome.mkdirs();
+		if (!createdDirectory) {
+			throw new MojoExecutionException("Unable to create Avatar.js directory " + avatarJsHome.getAbsolutePath());
+		}
+
+		final String homePath = avatarJsHome.getAbsolutePath();
+		final String nativeLibFilename = "libavatar-js." + platform.extension;
+		final File nativeLibFile = new File(homePath + File.separator + nativeLibFilename);
+
+		try {
+			getLog().info("Preparing Avatar.js native library in " + avatarJsHome.getAbsolutePath());
+			FileUtils.copyFile(repoFile, nativeLibFile);
+		}
+		catch (final IOException e) {
+			throw new MojoExecutionException("Unable to prepare Avatar.js native library", e);
+		}
 	}
 
 	private File getArtifact(final String groupId, final String artifactId, final String classifier, final String extension, final String version) throws MojoExecutionException {

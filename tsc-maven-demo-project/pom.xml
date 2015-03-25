@@ -29,4 +29,15 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>java.net-Snapshots</id>
+			<url>https://maven.java.net/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
 </project>
