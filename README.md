@@ -57,3 +57,22 @@ exploring the second matter cannot be completed.
 * A team decision on whether to adopt Angular 2 for front-end development, and whether we are willing to tie together
 two build processes (Maven triggering a Grunt build that uses [grunt-ts](https://github.com/TypeStrong/grunt-ts) for
 TypeScript compilation) or would prefer to use only Maven.
+
+License
+-------
+
+Except where otherwise noted, everything contained in this repository is
+
+    Copyright 2015 William Ono
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
