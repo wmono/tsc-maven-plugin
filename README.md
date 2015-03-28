@@ -40,6 +40,10 @@ install/deploy the [TypeScript redistribution](typescript/) and [tsc-maven-plugi
 either to your local Maven repository ($HOME/.m2/repository) or your local Maven repository manager (e.g. Artifactory
 or Nexus). Next, take a look at the included [demo project](tsc-maven-demo-project/) for usage information.
 
+Reasonable defaults have been provided for every user-serviceable configuration option. Refer to
+[CompileMojo](tsc-maven-plugin/src/main/java/ca/eqv/maven/plugins/tsc/mojo/CompileMojo.java) (or your IDE's tooltips
+while editing your POM) to see what can be changed on the fly.
+
 Project status
 --------------
 
