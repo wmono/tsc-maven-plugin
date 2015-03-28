@@ -46,12 +46,16 @@ public class CompileMojo extends AbstractMojo {
 	private File sourceRoot;
 
 	/** Top-level source files to compile, relative to sourceRoot */
-	@Parameter(defaultValue = "references.ts")
+	@Parameter(defaultValue = "reference.ts")
 	private String[] sources;
 
-	/** Output file */
-	@Parameter(defaultValue = "${project.build.directory}/app.js")
-	private File outputFile;
+	/** The directory where the webapp is built. (Should match maven-war-plugin's webappDirectory.) */
+	@Parameter(defaultValue = "${project.build.directory}/${project.build.finalName}")
+	private File webappDirectory;
+
+	/** Output file, relative to webappDirectory */
+	@Parameter(defaultValue = "app.js")
+	private String outputFilename;
 
 	/** Target language level */
 	@Parameter(defaultValue = "ES5")
@@ -242,7 +246,7 @@ public class CompileMojo extends AbstractMojo {
 		}
 		else {
 			arguments.addAll(Arrays.asList(
-					"--out", outputFile.getAbsolutePath(),
+					"--out", webappDirectory.getAbsolutePath() + File.separator + outputFilename,
 					"--target", targetLanguageLevel
 			));
 			if (generateSourceMap) {
