@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ca.eqv.maven.plugins.tsc</groupId>
 	<artifactId>tsc-maven-plugin</artifactId>
-	<version>0.1.0.RELEASE</version>
+	<version>0.1.1.BUILD-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>Maven TypeScript Compiler Plugin</name>
 
