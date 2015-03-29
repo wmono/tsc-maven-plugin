@@ -23,7 +23,7 @@ It's slow. Startup time for tsc is somewhere around 12 seconds.
 What about watching the directory and recompiling when a file changes?
 ----------------------------------------------------------------------
 
-That's your IDE's job.
+That's your IDE's job. If you want to do it anyway, run the tsc:watch goal.
 
 Alternatives
 ------------
@@ -41,8 +41,8 @@ either to your local Maven repository ($HOME/.m2/repository) or your local Maven
 or Nexus). Next, take a look at the included [demo project](tsc-maven-demo-project/) for usage information.
 
 Reasonable defaults have been provided for every user-serviceable configuration option. Refer to
-[CompileMojo](tsc-maven-plugin/src/main/java/ca/eqv/maven/plugins/tsc/mojo/CompileMojo.java) (or your IDE's tooltips
-while editing your POM) to see what can be changed on the fly.
+[AbstractTypeScriptMojo](tsc-maven-plugin/src/main/java/ca/eqv/maven/plugins/tsc/mojo/AbstractTypeScriptMojo.java)
+(or your IDE's tooltips while editing your POM) to see what can be changed on the fly.
 
 Project status
 --------------

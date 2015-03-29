@@ -6,10 +6,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import java.util.Collections;
 import java.util.List;
 
-@Mojo(name = "compile", defaultPhase = LifecyclePhase.COMPILE)
-public class CompileMojo extends AbstractTypeScriptMojo {
+@Mojo(name = "watch", defaultPhase = LifecyclePhase.NONE)
+public class WatchMojo extends AbstractTypeScriptMojo {
 	@Override
 	protected List<String> getModeArguments() {
-		return Collections.emptyList();
+		return Collections.singletonList("--watch");
 	}
 }
