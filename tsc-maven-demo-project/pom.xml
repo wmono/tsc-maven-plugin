@@ -17,7 +17,7 @@
 			<plugin>
 				<groupId>ca.eqv.maven.plugins.tsc</groupId>
 				<artifactId>tsc-maven-plugin</artifactId>
-				<version>0.1.1.BUILD-SNAPSHOT</version>
+				<version>0.1.1.RELEASE</version>
 				<executions>
 					<execution>
 						<goals>
